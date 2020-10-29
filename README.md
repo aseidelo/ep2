@@ -16,7 +16,7 @@ Instalar todas as dependências necessárias seguindo o [este tutorial]().
 
 - criar o embedding limitado em 200k palavras com:
 
-'''python
+```python
 # Pré-processa embedding
 N =  200001
 with open("cbow_s50.txt", "r") as file:
@@ -26,7 +26,7 @@ head[0] = str(N-1)+ " " + "50"+ "\n" # Conserta contagem de palavras
 with open("word2vec_200k.txt", "w") as file:
     for line in head:
         file.write(line)
-'''
+```
 
 - colocar word2vec_200k.txt em data/
 
@@ -36,7 +36,7 @@ _ data_prep.py _
 
 Exemplo: Gerar banco de dados com 10k amostras
 
-''' python3 data_prep.py --inpath ../data --dataset B2W-Reviews01 --outpath ../data -N 10000 '''
+``` python3 data_prep.py --inpath ../data --dataset B2W-Reviews01 --outpath ../data -N 10000 ```
 
 _ train.py _
 
@@ -44,18 +44,18 @@ _ train.py _
 
 Parâmetros principais:
 
-'''
+```
 --inpath : diretório do banco de dados
 --dataset : nome do dataset processado <nome>_<N>
 --embedding : nome do arquivo com word2vec pretreinado (sem o .txt).
 --dropout : taxa de dropout da camada densa <float ex.:0.1>
 -bidirectional: se adicionar esse parametro a camada lstm vira bidirecional
-'''
+```
 
 Parâmetros adicionais do modelo já estão definidos por default, mas podem ser alterados via linha de comando (ver as definições de argparse em train.py).
 
 Exemplo:
 
-''' python3 train.py --dataset B2W-Reviews01_10000 --inpath ../data --embedding word2vec_200k --dropout 0.2 -bidirectional
- '''
+``` python3 train.py --dataset B2W-Reviews01_10000 --inpath ../data --embedding word2vec_200k --dropout 0.2 -bidirectional
+ ```
 

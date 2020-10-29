@@ -28,7 +28,6 @@ def plot_metrics(history, dataset, bidir, dropout):
         plt.close()
 
 def train(max_epochs, batch_size, saModel, train_inputs, train_outputs, validation_inputs, validation_outputs, dataset, bidir, dropout):
-
     # definir early stopping baseado na AUC
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor='val_loss', 

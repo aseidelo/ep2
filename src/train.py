@@ -52,9 +52,9 @@ def test(saModel, x_test, y_test, dataset, bidir, dropout):
 
 if (__name__ == '__main__'):
     parser = argparse.ArgumentParser(description='Prepare B2W dataset for Sentiment Analisys task in portuguese.')
-    parser.add_argument('--inpath', metavar='<dir>', type=str, help='raw data path', default='../data/')
-    parser.add_argument('--outpath', metavar='<dir>', type=str, help='path for processed data', default='../data/')
-    parser.add_argument('--dataset', metavar='<csv file prefix>', type=str, help='csv dataset file name', default='B2W-Reviews01_132289')
+    parser.add_argument('--inpath', metavar='<dir>', type=str, help='raw data path', default='../data')
+    #parser.add_argument('--outpath', metavar='<dir>', type=str, help='path for processed data', default='../doc')
+    parser.add_argument('--dataset', metavar='<csv file prefix>', type=str, help='csv dataset file name', default='B2W-Reviews01_10000')
     parser.add_argument('--epochs', metavar='N', type=int, help='Number of epochs for training', default=100)
     parser.add_argument('--maxlen', metavar='N', type=int, help='max number of tokens to be read on each sentence', default=200)
     parser.add_argument('--vocabsize', metavar='N', type=int, help='number of words to be considered for the vocabulary', default=20000)
@@ -62,7 +62,7 @@ if (__name__ == '__main__'):
     parser.add_argument('--batchsize', metavar='N', type=int, help='batch size', default=32)
     parser.add_argument('--dropout', metavar='N', type=float, help='Dropout rate', default=0.0)
     parser.add_argument('-bidirectional', action='store_true', help='Use bidirectional RNN layer?')
-    parser.add_argument('--word2vec', metavar='<txt file prefix>', type=str, help='embedding size', default='word2vec_200k')
+    parser.add_argument('--embedding', metavar='<txt file prefix>', type=str, help='embedding size', default='word2vec_200k')
     args = parser.parse_args()
     max_epochs = args.epochs
     maxlen = args.maxlen
@@ -70,7 +70,7 @@ if (__name__ == '__main__'):
     embed_dim = args.embeddim
     dropout = args.dropout
     bidir = args.bidirectional
-    dataset_train, dataset_val, dataset_test = data_prep.load_train_val_test(args.inpath + args.dataset)
+    dataset_train, dataset_val, dataset_test = data_prep.load_train_val_test(args.inpath + '/' + args.dataset)
     inputs_train = np.array([dataset_train["review_text"]]).T
     outputs_train = np.array([dataset_train["rating"]]).T
     inputs_val = np.array([dataset_val["review_text"]]).T
@@ -81,11 +81,7 @@ if (__name__ == '__main__'):
     tokenized_inputs_train = tokenizer(inputs_train)
     tokenized_inputs_val = tokenizer(inputs_val)
     tokenized_inputs_test = tokenizer(inputs_test)
-    word2vec_file = args.inpath + args.word2vec + '.txt'
-    dps = [0.1]#, 0.25, 0.5]
-    bidirs = [True]#False, True]
-    for dp in dps:
-        for bd in bidirs:
-            saModel = model.createSAModel(maxlen, vocab_size, embed_dim, tokenizer, word2vec_file, 128, bd, dp)
-            train(max_epochs, args.batchsize, saModel, tokenized_inputs_train, outputs_train, tokenized_inputs_val, outputs_val, args.dataset, bd, dp)
-            test(saModel, tokenized_inputs_test, outputs_test, args.dataset, bd, dp)
+    word2vec_file = args.inpath + '/' + args.embedding + '.txt'
+    saModel = model.createSAModel(maxlen, vocab_size, embed_dim, tokenizer, word2vec_file, 128, bidir, dropout)
+    train(max_epochs, args.batchsize, saModel, tokenized_inputs_train, outputs_train, tokenized_inputs_val, outputs_val, args.dataset, bidir, dropout)
+    test(saModel, tokenized_inputs_test, outputs_test, args.dataset, bidir, dropout)

@@ -8,7 +8,7 @@ Arquiteturas de encoder com uma camada (1) LSTM unidirecional e (2) bidirecional
 
 * Como utilizar:
 
-Instalar todas as dependências necessárias seguindo o [este tutorial]().
+- Instalar todas as dependências necessárias seguindo [esse tutorial](https://github.com/alan-barzilay/NLPortugues).
 
 - Colocar o banco de dados [B2W-Reviews01](https://github.com/b2wdigital/b2w-reviews01) em data/ .
 
@@ -56,6 +56,5 @@ Parâmetros adicionais do modelo já estão definidos por default, mas podem ser
 
 Exemplo:
 
-``` python3 train.py --dataset B2W-Reviews01_10000 --inpath ../data --embedding word2vec_200k --dropout 0.2 -bidirectional
- ```
+``` python3 train.py --dataset B2W-Reviews01_10000 --inpath ../data --embedding word2vec_200k --dropout 0.2 -bidirectional ```
 

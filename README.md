@@ -10,11 +10,23 @@ Arquiteturas de encoder com uma camada (1) LSTM unidirecional e (2) bidirecional
 
 - Instalar todas as dependências necessárias seguindo [esse tutorial](https://github.com/alan-barzilay/NLPortugues).
 
+- Criar os diretórios data/ e doc/ e colocar no mesmo diretório que src
+
+```
+cd <caminho ate pasta que esta src>
+mkdir data
+mkdir doc
+```
+
 - Colocar o banco de dados [B2W-Reviews01](https://github.com/b2wdigital/b2w-reviews01) em data/ .
 
-- baixar o embedding [word2vec](http://www.nilc.icmc.usp.br/embeddings) (cbow ou skip-gram) pretreinado para português em 50 dimensões.
+```
+mv B2W-Reviews01.csv data/
+```
 
-- criar o embedding limitado em 200k palavras com:
+- baixar o embedding [word2vec](http://www.nilc.icmc.usp.br/embeddings) (cbow) pretreinado para português em 50 dimensões.
+
+- criar o embedding limitado em 200k palavras com o script abaixo, no arquivo "word2vec_200k.txt":
 
 ```python
 # Pré-processa embedding
@@ -30,13 +42,22 @@ with open("word2vec_200k.txt", "w") as file:
 
 - colocar word2vec_200k.txt em data/
 
+```
+mv word2vec_200k.txt data/
+```
+
 _ data_prep.py _
 
 - Processar os dados do arquivo csv, separa os campos "review_text" e "overall_rating". Separa o banco de dados em treino, validação em teste nas proporções (65%-15%-20%) Pode gerar um número limitado de exeplos N (0 < N < 130000).
 
-Exemplo: Gerar banco de dados com 10k amostras
+ATENÇÃO: Esse script foi criado para tratar do banco de dados "cru" (de 130k exemplos) do B2W, e não do processado utilizado em sala de aula. Para testar com número limitado de amostras, basta utilizar o parâmetro -N <n_amostras>.
 
-``` python3 data_prep.py --inpath ../data --dataset B2W-Reviews01 --outpath ../data -N 10000 ```
+Exemplo: Gerar banco de dados com 10k amostras. Não definir N fará com que o banco de dados seja gerado com todas as amostras.
+
+``` 
+cd src/
+python3 data_prep.py --inpath ../data --dataset B2W-Reviews01 --outpath ../data -N 10000 
+```
 
 _ train.py _
 
@@ -56,5 +77,5 @@ Parâmetros adicionais do modelo já estão definidos por default, mas podem ser
 
 Exemplo:
 
-``` python3 train.py --dataset B2W-Reviews01_10000 --inpath ../data --embedding word2vec_200k --dropout 0.2 -bidirectional ```
+``` python3 train.py --dataset B2W-Reviews01_10000 --inpath ../data --outpath ../doc --embedding word2vec_200k --dropout 0.2 -bidirectional ```
 

@@ -5,7 +5,7 @@ import data_prep
 import matplotlib.pyplot as plt
 import argparse
 
-def plot_metrics(history, dataset, bidir, dropout):
+def plot_metrics(history, dataset, bidir, dropout, outpath):
     metrics =  ['accuracy']
     for n, metric in enumerate(metrics):
         name = metric.replace("_"," ").capitalize()
@@ -22,12 +22,12 @@ def plot_metrics(history, dataset, bidir, dropout):
             plt.ylim([0,1])
         plt.legend()
         if(bidir):
-            plt.savefig('../doc/' + dataset + 'bidirectional_lstm_dp' + str(int(dropout*100)) + '.png')
+            plt.savefig(outpath + '/' + dataset + 'bidirectional_lstm_dp' + str(int(dropout*100)) + '.png')
         else:
-            plt.savefig('../doc/' + dataset + 'unidirectional_lstm_dp' + str(int(dropout*100)) + '.png')
+            plt.savefig(outpath + '/' + dataset + 'unidirectional_lstm_dp' + str(int(dropout*100)) + '.png')
         plt.close()
 
-def train(max_epochs, batch_size, saModel, train_inputs, train_outputs, validation_inputs, validation_outputs, dataset, bidir, dropout):
+def train(max_epochs, batch_size, saModel, train_inputs, train_outputs, validation_inputs, validation_outputs, dataset, bidir, dropout, outpath):
     # definir early stopping baseado na AUC
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor='val_loss', 
@@ -37,10 +37,10 @@ def train(max_epochs, batch_size, saModel, train_inputs, train_outputs, validati
 
     saModel.compile("adam", "sparse_categorical_crossentropy", metrics=['accuracy'])
     history = saModel.fit(train_inputs, train_outputs, batch_size=batch_size, epochs=max_epochs, validation_data=(validation_inputs, validation_outputs), callbacks=[early_stopping])
-    plot_metrics(history, dataset, bidir, dropout)
+    plot_metrics(history, dataset, bidir, dropout, outpath)
 
-def test(saModel, x_test, y_test, dataset, bidir, dropout):
-    out_file = '../doc/' + dataset + '.txt'
+def test(saModel, x_test, y_test, dataset, bidir, dropout, outpath):
+    out_file = outpath + '/' + dataset + '.txt'
     output = saModel.evaluate(x=x_test, y=y_test)
     with open(out_file, 'a+') as file:
         if(bidir):
@@ -53,8 +53,8 @@ def test(saModel, x_test, y_test, dataset, bidir, dropout):
 if (__name__ == '__main__'):
     parser = argparse.ArgumentParser(description='Prepare B2W dataset for Sentiment Analisys task in portuguese.')
     parser.add_argument('--inpath', metavar='<dir>', type=str, help='raw data path', default='../data')
-    #parser.add_argument('--outpath', metavar='<dir>', type=str, help='path for processed data', default='../doc')
-    parser.add_argument('--dataset', metavar='<csv file prefix>', type=str, help='csv dataset file name', default='B2W-Reviews01_10000')
+    parser.add_argument('--outpath', metavar='<dir>', type=str, help='path for processed data', default='../doc')
+    parser.add_argument('--dataset', metavar='<csv file prefix>', type=str, help='csv dataset file name', default='B2W-Reviews01_132289')
     parser.add_argument('--epochs', metavar='N', type=int, help='Number of epochs for training', default=100)
     parser.add_argument('--maxlen', metavar='N', type=int, help='max number of tokens to be read on each sentence', default=200)
     parser.add_argument('--vocabsize', metavar='N', type=int, help='number of words to be considered for the vocabulary', default=20000)
@@ -83,5 +83,5 @@ if (__name__ == '__main__'):
     tokenized_inputs_test = tokenizer(inputs_test)
     word2vec_file = args.inpath + '/' + args.embedding + '.txt'
     saModel = model.createSAModel(maxlen, vocab_size, embed_dim, tokenizer, word2vec_file, 128, bidir, dropout)
-    train(max_epochs, args.batchsize, saModel, tokenized_inputs_train, outputs_train, tokenized_inputs_val, outputs_val, args.dataset, bidir, dropout)
-    test(saModel, tokenized_inputs_test, outputs_test, args.dataset, bidir, dropout)
+    train(max_epochs, args.batchsize, saModel, tokenized_inputs_train, outputs_train, tokenized_inputs_val, outputs_val, args.dataset, bidir, dropout, args.outpath)
+    test(saModel, tokenized_inputs_test, outputs_test, args.dataset, bidir, dropout, args.outpath)
